@@ -1,0 +1,23 @@
+package foodiediary.friendship.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Entity
+public class Friendship {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long userId;     // 요청 보낸 쪽
+    private Long friendId;   // 요청 받은 쪽
+
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatus status; // PENDING, ACCEPTED, REJECTED
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+}
