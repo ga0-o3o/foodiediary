@@ -20,7 +20,4 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     @Query("SELECT f FROM Friendship f WHERE f.userId = :userId AND f.status = 'PENDING'")
     List<Friendship> findSentRequests(Long userId);
-
-    @Query("SELECT f FROM Friendship f WHERE ((f.userId = :userId AND f.friendId = :friendId) OR (f.userId = :friendId AND f.friendId = :userId))")
-    Optional<Friendship> findExistingRelation(Long userId, Long friendId);
 }
