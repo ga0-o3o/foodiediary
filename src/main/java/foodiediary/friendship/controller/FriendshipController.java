@@ -8,8 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/foodiediary/friends")
 public class FriendshipController {
 
     private final FriendshipService friendshipService;

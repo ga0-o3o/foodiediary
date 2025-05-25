@@ -2,6 +2,7 @@ package foodiediary.user.controller;
 
 import foodiediary.security.JwtProvider;
 import foodiediary.user.dto.LoginDto;
+import foodiediary.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +19,17 @@ public class LoginController {
 
     private final JwtProvider jwtProvider;
 
-    @Autowired
-    public LoginController(JwtProvider jwtProvider) {
+    private final UserService userService;
+    public LoginController(UserService userService, JwtProvider jwtProvider) {
+        this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
     @PostMapping("/foodiediary/user/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-        // 로그인 확인
         System.out.println("ID: " + loginDto.getId());
 
-        if (true) {
+        if (userService.isSuccessLogin(loginDto)) {
             String token = jwtProvider.generateToken(loginDto.getId());
             return ResponseEntity.ok(Map.of("token", token));
         } else {
