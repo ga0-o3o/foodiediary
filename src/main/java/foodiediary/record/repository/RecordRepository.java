@@ -8,12 +8,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
-
-    List<Record> findTop10ByTitle(String title);
-
-    List<Record> findTop10ByDescription(String description);
-
-    List<Record> findTop10ByCoordinateXAndCoordinateY(BigDecimal coordinateX, BigDecimal coordinateY);
-
-    List<Record> findTop10ByDate(LocalDate date);
+    List<Record> findByAuthor(String author); // 사용자 이름으로 기록 찾기
+//    List<Record> findTop10ByTitle(String title);
+//
+//    List<Record> findTop10ByDescription(String description);
+//
+//    List<Record> findTop10ByCoordinateXAndCoordinateY(BigDecimal coordinateX, BigDecimal coordinateY);
+//
+//    List<Record> findTop10ByDate(LocalDate date);
 }

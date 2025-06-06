@@ -1,5 +1,6 @@
 package foodiediary.record.controller;
 
+import foodiediary.record.dto.RecordResponseDto;
 import foodiediary.record.dto.RecordWriteRequestDto;
 import foodiediary.record.service.RecordService;
 import java.math.BigDecimal;
@@ -32,5 +33,10 @@ public class RecordController {
         RecordWriteRequestDto dto = new RecordWriteRequestDto(title, description, coordinateX, coordinateY, date, images);
         Long recordId = recordService.writeRecord(dto, authorId);
         return ResponseEntity.ok(recordId);
+    }
+    
+    @GetMapping("/list")
+    public List<RecordResponseDto> getRecordsByAuthor(@RequestParam String authorId) {
+        return recordService.getRecordsByAuthor(authorId);
     }
 }

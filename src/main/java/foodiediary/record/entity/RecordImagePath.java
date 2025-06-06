@@ -9,9 +9,8 @@ public class RecordImagePath {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "record_id")
-	private Record record;
+	@Column(name = "record_id")
+	private Long recordId;
 	
 	@Column(name = "image_paths", length = 255)
 	private String imagePath;
