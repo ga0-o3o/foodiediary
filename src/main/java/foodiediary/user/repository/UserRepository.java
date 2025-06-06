@@ -9,4 +9,3 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<Object> findByIdAndPw(String id, String pw);
 }
-

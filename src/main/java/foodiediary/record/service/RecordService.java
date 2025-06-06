@@ -49,5 +49,30 @@ public class RecordService {
         }
         return record.getId();
     }
+
+    public List<Record> findByOneNonNullField(Record probe) {
+        if (probe.getTitle() != null) {
+            return recordRepository.findTop10ByTitle(probe.getTitle());
+        } else if (probe.getDescription() != null) {
+            return recordRepository.findTop10ByDescription(probe.getDescription());
+        } else if (probe.getCoordinateX() != null && probe.getCoordinateY() != null) {
+            return recordRepository.findTop10ByCoordinateXAndCoordinateY(probe.getCoordinateX(), probe.getCoordinateY());
+        } else if (probe.getDate() != null) {
+            return recordRepository.findTop10ByDate(probe.getDate());
+        } else {
+            return List.of(); // 전부 null인 경우
+        }
+    }
+
+    public List<Record> getRecord(RecordWriteRequestDto dto) {
+        Record probe = new Record();
+        probe.setTitle(dto.getTitle());
+        probe.setDescription(dto.getDescription());
+        probe.setCoordinateX(dto.getCoordinateX());
+        probe.setCoordinateY(dto.getCoordinateY());
+        probe.setDate(dto.getDate());
+
+        return findByOneNonNullField(probe);
+    }
 }
 
