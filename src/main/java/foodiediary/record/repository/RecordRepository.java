@@ -9,11 +9,15 @@ import java.util.List;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findByAuthor(String author); // 사용자 이름으로 기록 찾기
-//    List<Record> findTop10ByTitle(String title);
-//
-//    List<Record> findTop10ByDescription(String description);
-//
-//    List<Record> findTop10ByCoordinateXAndCoordinateY(BigDecimal coordinateX, BigDecimal coordinateY);
-//
-//    List<Record> findTop10ByDate(LocalDate date);
+
+    List<Record> findByTitle(String title);
+
+    List<Record> findByDescription(String description);
+
+    List<Record> findByCoordinateXAndCoordinateY(BigDecimal coordinateX, BigDecimal coordinateY);
+
+    List<Record> findByDate(LocalDate date);
+
+    List<Record> findByDescriptionIgnoreCaseContaining(String keyword);
+
 }

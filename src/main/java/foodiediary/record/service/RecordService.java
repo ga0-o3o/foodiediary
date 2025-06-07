@@ -7,6 +7,9 @@ import foodiediary.record.entity.RecordImagePath;
 import foodiediary.record.repository.RecordImagePathRepository;
 import foodiediary.record.repository.RecordRepository;
 import foodiediary.s3.S3Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,11 +57,54 @@ public class RecordService {
     
     public List<RecordResponseDto> getRecordsByAuthor(String authorId) {
         List<Record> records = recordRepository.findByAuthor(authorId);
+        return mapToResponseDto(records);
+    }
+
+
+    public List<RecordResponseDto> getFilteredRecords(String authorId, LocalDate date, BigDecimal coordinate_x,
+                                                      BigDecimal coordinate_y, String description, String title) {
+        if (authorId != null) {
+            return getRecordsByAuthor(authorId);
+        } else if (title != null) {
+            return getRecordsByTitle(title);
+        } else if(date != null){
+            return getRecordsByDate(date);
+        } else if(coordinate_x != null && coordinate_y != null){
+            return getRecordsByCoordinate(coordinate_x, coordinate_y);
+        } else if(description != null){
+            return getRecordsByDescription(description);
+        } else {
+            return List.of(); // 조건 없을 경우
+        }
+    }
+
+    private List<RecordResponseDto> getRecordsByDescription(String description) {
+        List<Record> records = recordRepository.findByDescriptionIgnoreCaseContaining(description);
+        return mapToResponseDto(records);
+    }
+
+    private List<RecordResponseDto> getRecordsByCoordinate(BigDecimal coordinateX, BigDecimal coordinateY) {
+        List<Record> records = recordRepository.findByCoordinateXAndCoordinateY(coordinateX, coordinateY);
+        return mapToResponseDto(records);
+    }
+
+    private List<RecordResponseDto> getRecordsByDate(LocalDate date) {
+        List<Record> records = recordRepository.findByDate(date);
+        return mapToResponseDto(records);
+    }
+
+    private List<RecordResponseDto> getRecordsByTitle(String title) {
+        List<Record> records = recordRepository.findByTitle(title);
+        return mapToResponseDto(records);
+    }
+
+    private List<RecordResponseDto> mapToResponseDto(List<Record> records) {
         return records.stream().map(record -> {
             List<String> imagePaths = imagePathRepository.findByRecordId(record.getId())
                     .stream()
                     .map(RecordImagePath::getImagePath)
                     .collect(Collectors.toList());
+
             return new RecordResponseDto(
                     record.getId(),
                     record.getTitle(),
@@ -71,29 +117,6 @@ public class RecordService {
         }).collect(Collectors.toList());
     }
 
-//    public List<Record> findByOneNonNullField(Record probe) {
-//        if (probe.getTitle() != null) {
-//            return recordRepository.findTop10ByTitle(probe.getTitle());
-//        } else if (probe.getDescription() != null) {
-//            return recordRepository.findTop10ByDescription(probe.getDescription());
-//        } else if (probe.getCoordinateX() != null && probe.getCoordinateY() != null) {
-//            return recordRepository.findTop10ByCoordinateXAndCoordinateY(probe.getCoordinateX(), probe.getCoordinateY());
-//        } else if (probe.getDate() != null) {
-//            return recordRepository.findTop10ByDate(probe.getDate());
-//        } else {
-//            return List.of(); // 전부 null인 경우
-//        }
-//    }
-//
-//    public List<Record> getRecord(RecordWriteRequestDto dto) {
-//        Record probe = new Record();
-//        probe.setTitle(dto.getTitle());
-//        probe.setDescription(dto.getDescription());
-//        probe.setCoordinateX(dto.getCoordinateX());
-//        probe.setCoordinateY(dto.getCoordinateY());
-//        probe.setDate(dto.getDate());
-//
-//        return findByOneNonNullField(probe);
-//    }
+
 }
 
