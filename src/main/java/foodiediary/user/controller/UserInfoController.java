@@ -26,6 +26,9 @@ public class UserInfoController {
 
     @PatchMapping("/foodiediary/user/info")
     public ResponseEntity<Void> editUserInfo(HttpServletRequest request, @RequestBody UserFormDto editDto){
+        String userId = (String) request.getAttribute("id");
+        editDto.setId(userId);
+
         if(userService.updateUserInfo(editDto)){
             return ResponseEntity.ok().build();
         } else {
