@@ -58,4 +58,17 @@ public class RecordController {
 
         return recordService.getFilteredRecords(authorId, parsedDate, x, y, description, title);
     }
+
+    @GetMapping("/page")
+    public List<RecordResponseDto> getInitialPage(@RequestParam(required = false) String pageNum){
+        int page;
+        if(pageNum == null){
+            page = 1;
+        } else {
+            page = Integer.parseInt(pageNum);
+        }
+
+        return recordService.getPagedRecords(page);
+    }
+
 }

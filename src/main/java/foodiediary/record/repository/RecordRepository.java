@@ -1,6 +1,8 @@
 package foodiediary.record.repository;
 
 import foodiediary.record.entity.Record;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
@@ -19,5 +21,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findByDate(LocalDate date);
 
     List<Record> findByDescriptionIgnoreCaseContaining(String keyword);
+
+    Page<Record> findAllByOrderByDateDesc(Pageable pageable);
 
 }

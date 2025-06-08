@@ -12,6 +12,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,6 +100,12 @@ public class RecordService {
     private List<RecordResponseDto> getRecordsByTitle(String title) {
         List<Record> records = recordRepository.findByTitle(title);
         return mapToResponseDto(records);
+    }
+
+    public List<RecordResponseDto> getPagedRecords(int pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, 5, Sort.by(Sort.Direction.DESC, "date"));
+        Page<Record> page = recordRepository.findAllByOrderByDateDesc(pageable);
+        return mapToResponseDto(page.getContent());
     }
 
     private List<RecordResponseDto> mapToResponseDto(List<Record> records) {
