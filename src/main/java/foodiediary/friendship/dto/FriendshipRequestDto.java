@@ -6,5 +6,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FriendshipRequestDto {
-    private Long targetId;
+    private String targetId;
 }

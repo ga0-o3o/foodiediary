@@ -13,8 +13,8 @@ public class Friendship {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;     // 요청 보낸 쪽
-    private Long friendId;   // 요청 받은 쪽
+    private String userId;     // 요청 보낸 쪽
+    private String friendId;   // 요청 받은 쪽
 
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status; // PENDING, ACCEPTED, REJECTED

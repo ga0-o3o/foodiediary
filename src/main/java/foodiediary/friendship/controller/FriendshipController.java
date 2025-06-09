@@ -1,79 +1,75 @@
 package foodiediary.friendship.controller;
 
 import foodiediary.friendship.dto.FriendshipRequestDto;
-import foodiediary.friendship.service.FriendshipService;
 import foodiediary.friendship.entity.Friendship;
-import org.springframework.web.bind.annotation.*;
+import foodiediary.friendship.service.FriendshipService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/foodiediary/friends")
+@RequestMapping("/friends")
+@RequiredArgsConstructor
 public class FriendshipController {
 
-    private final FriendshipService friendshipService;
+    private final FriendshipService svc;
 
-    public FriendshipController(FriendshipService friendshipService) {
-        this.friendshipService = friendshipService;
+    private String getMyId(HttpServletRequest req) {
+        return (String) req.getAttribute("id");
     }
 
-    // 친구 요청 보내기
     @PostMapping("/request")
-    public Friendship sendFriendRequest(HttpServletRequest request, @RequestBody FriendshipRequestDto dto) {
-        Long myId = Long.valueOf((String) request.getAttribute("id")); // (실제로는 로그인 사용자 ID)
-        return friendshipService.sendFriendRequest(myId, dto.getTargetId());
+    public Friendship sendFriendRequest(HttpServletRequest req,
+                                        @RequestBody FriendshipRequestDto dto) {
+        String myId = getMyId(req);
+        return svc.sendFriendRequest(myId, dto.getTargetId());
     }
 
-    // 친구 요청 취소
     @DeleteMapping("/requests/{targetId}/cancel")
-    public void cancelFriendRequest(HttpServletRequest request, @PathVariable Long targetId) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        friendshipService.cancelFriendRequest(myId, targetId);
+    public void cancelFriendRequest(HttpServletRequest req,
+                                    @PathVariable String targetId) {
+        String myId = getMyId(req);
+        svc.cancelFriendRequest(myId, targetId);
     }
 
-    // 친구 요청 수락
     @PostMapping("/requests/{requesterId}/accept")
-    public void acceptFriendRequest(HttpServletRequest request, @PathVariable Long requesterId) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        friendshipService.acceptFriendRequest(myId, requesterId);
+    public void acceptFriendRequest(HttpServletRequest req,
+                                    @PathVariable String requesterId) {
+        String myId = getMyId(req);
+        svc.acceptFriendRequest(myId, requesterId);
     }
 
-    // 친구 요청 거절
     @PostMapping("/requests/{requesterId}/reject")
-    public void rejectFriendRequest(HttpServletRequest request, @PathVariable Long requesterId) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        friendshipService.rejectFriendRequest(myId, requesterId);
+    public void rejectFriendRequest(HttpServletRequest req,
+                                    @PathVariable String requesterId) {
+        String myId = getMyId(req);
+        svc.rejectFriendRequest(myId, requesterId);
     }
 
-    // 친구 삭제
     @DeleteMapping("/{friendId}")
-    public void deleteFriend(HttpServletRequest request, @PathVariable Long friendId) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        friendshipService.deleteFriend(myId, friendId);
+    public void deleteFriend(HttpServletRequest req,
+                             @PathVariable String friendId) {
+        String myId = getMyId(req);
+        svc.deleteFriend(myId, friendId);
     }
 
-    // 내 친구 목록 조회
     @GetMapping
-    public List<Friendship> getMyFriends(HttpServletRequest request) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        return friendshipService.getMyFriends(myId);
+    public List<Friendship> getMyFriends(HttpServletRequest req) {
+        String myId = getMyId(req);
+        return svc.getMyFriends(myId);
     }
 
-    // 받은 친구 요청 목록 조회
     @GetMapping("/requests/received")
-    public List<Friendship> getReceivedRequests(HttpServletRequest request) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        return friendshipService.getReceivedRequests(myId);
+    public List<Friendship> getReceivedRequests(HttpServletRequest req) {
+        String myId = getMyId(req);
+        return svc.getReceivedRequests(myId);
     }
 
-    // 보낸 친구 요청 목록 조회
     @GetMapping("/requests/sent")
-    public List<Friendship> getSentRequests(HttpServletRequest request) {
-        Long myId = Long.valueOf((String) request.getAttribute("id"));
-        return friendshipService.getSentRequests(myId);
+    public List<Friendship> getSentRequests(HttpServletRequest req) {
+        String myId = getMyId(req);
+        return svc.getSentRequests(myId);
     }
-
-    // 친구 검색은 User 필요
 }
