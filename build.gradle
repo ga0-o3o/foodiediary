@@ -20,10 +20,14 @@ configurations {
 }
 
 repositories {
+	maven { url "https://repo.osgeo.org/repository/release/" }
 	mavenCentral()
 }
 
 dependencies {
+	implementation 'org.geotools:gt-main:33.1'
+	implementation 'org.geotools:gt-referencing:33.1'
+	implementation 'org.geotools:gt-epsg-hsql:33.1'
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
