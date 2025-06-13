@@ -8,7 +8,7 @@ import lombok.Getter;
 public class RestaurantResponseDto {
 	private Integer id;
 	private String businessName;
-	private Double coordX;
-	private Double coordY;
+	private Double latitue;
+	private Double longitude;
 	private String fullAddress;
 }
