@@ -18,7 +18,7 @@ public class RestaurantService {
 		List<Object[]> results = restaurantRepository.findNearbyRestaurants(
 				utmk[1],
 				utmk[0],
-				500.0
+				2000.0
 		);
 		
 		// 3. 결과 매핑 및 역변환
