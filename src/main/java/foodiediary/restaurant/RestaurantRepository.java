@@ -9,6 +9,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Integer>
 	
 	@Query(value = "SELECT r.id, r.business_name, r.coord_x, r.coord_y, r.full_address " +
 			"FROM restaurant r " +
-			"WHERE SQRT(POWER(r.coord_x - :latitude, 2) + POWER(r.coord_y - :longitude, 2)) <= :radius", nativeQuery = true)
-	List<Object[]> findNearbyRestaurants(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("radius") double radius);
+			"WHERE SQRT(POWER(r.coord_x - :longitude, 2) + POWER(r.coord_y - :latitude, 2)) <= :radius", nativeQuery = true)
+	List<Object[]> findNearbyRestaurants(@Param("longitude") double longitude, @Param("latitude") double latitude, @Param("radius") double radius);
 }

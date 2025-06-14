@@ -8,14 +8,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/foodiediary/restaurant")
 public class RestaurantController {
-	
+
 	private final RestaurantService restaurantService;
-	
+
 	@GetMapping("/nearby")
 	public List<RestaurantResponseDto> getNearbyRestaurants(
-			@RequestParam("latitude") double latitude,
-			@RequestParam("longitude") double longitude
-	) {
-		return restaurantService.findNearbyRestaurantsByLatLng(latitude, longitude);
+			@RequestParam("longitude") double longitude,
+			@RequestParam("latitude") double latitude) throws Exception {
+		return restaurantService.findNearbyRestaurantsByLngLat(longitude, latitude);
 	}
 }
