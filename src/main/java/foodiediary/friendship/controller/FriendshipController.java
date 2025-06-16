@@ -1,6 +1,7 @@
 package foodiediary.friendship.controller;
 
 import foodiediary.friendship.dto.FriendshipRequestDto;
+import foodiediary.friendship.dto.FriendshipResponseDto;
 import foodiediary.friendship.entity.Friendship;
 import foodiediary.friendship.service.FriendshipService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,20 +57,44 @@ public class FriendshipController {
     }
 
     @GetMapping
-    public List<Friendship> getMyFriends(HttpServletRequest req) {
+    public List<FriendshipResponseDto> getMyFriends(HttpServletRequest req) {
         String myId = getMyId(req);
-        return svc.getMyFriends(myId);
+        return svc.getMyFriends(myId).stream()
+                .map(f -> new FriendshipResponseDto(
+                        f.getId(),
+                        // 내가 아니면 상대
+                        f.getUserId().equals(myId) ? f.getFriendId() : f.getUserId(),
+                        f.getStatus(),
+                        f.getCreatedAt()
+                ))
+                .toList();
     }
 
     @GetMapping("/requests/received")
-    public List<Friendship> getReceivedRequests(HttpServletRequest req) {
+    public List<FriendshipResponseDto> getReceivedRequests(HttpServletRequest req) {
         String myId = getMyId(req);
-        return svc.getReceivedRequests(myId);
+        return svc.getReceivedRequests(myId).stream()
+                .map(f -> new FriendshipResponseDto(
+                        f.getId(),
+                        // received 요청일 땐 userId가 요청자
+                        f.getUserId(),
+                        f.getStatus(),
+                        f.getCreatedAt()
+                ))
+                .toList();
     }
 
     @GetMapping("/requests/sent")
-    public List<Friendship> getSentRequests(HttpServletRequest req) {
+    public List<FriendshipResponseDto> getSentRequests(HttpServletRequest req) {
         String myId = getMyId(req);
-        return svc.getSentRequests(myId);
+        return svc.getSentRequests(myId).stream()
+                .map(f -> new FriendshipResponseDto(
+                        f.getId(),
+                        // sent 요청일 땐 friendId가 대상
+                        f.getFriendId(),
+                        f.getStatus(),
+                        f.getCreatedAt()
+                ))
+                .toList();
     }
 }
