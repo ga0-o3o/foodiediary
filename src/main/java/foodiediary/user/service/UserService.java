@@ -41,7 +41,7 @@ public class UserService {
         boolean nameValidate = Pattern.matches(nameRegex, userFormDto.getName());
         System.out.println("name 양식 "+ nameValidate);
 
-        String phoneRegex = "^\\d{8}$";
+        String phoneRegex = "^\\d{11}$";
         boolean phoneValidate = Pattern.matches(phoneRegex, userFormDto.getPhoneNum());
         System.out.println("phone 양식 "+ phoneValidate);
 
