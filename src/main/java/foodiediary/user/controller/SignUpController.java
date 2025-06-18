@@ -1,5 +1,6 @@
 package foodiediary.user.controller;
 
+import foodiediary.user.dto.SignUpResultDto;
 import foodiediary.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,14 +21,13 @@ public class SignUpController {
     }
 
     @PostMapping("/foodiediary/user/signup")
-    public ResponseEntity<Void> postSignUp(@RequestBody UserFormDto dto){
-        System.out.println(dto.getId());
-        boolean ok = userService.saveUser(dto);
-        if(ok){
+    public ResponseEntity<?> postSignUp(@RequestBody UserFormDto dto){
+        SignUpResultDto result = userService.saveUser(dto);
+
+        if (result.isSuccess()) {
             return ResponseEntity.ok().build();
         } else {
-            // 회원가입 불가 사유를 전달하는게 좋을 듯?
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(result);
         }
     }
 }
