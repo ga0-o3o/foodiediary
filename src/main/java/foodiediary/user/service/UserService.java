@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.ArrayList;
 
 @Service
 public class UserService {
@@ -126,4 +130,11 @@ public class UserService {
         return false;
     }
 
+    public List<User> searchUsers(String keyword) {
+        // 예시: 아이디+이름 모두 검색한 뒤 합치고 중복 제거
+        Set<User> results = new LinkedHashSet<>();
+        results.addAll(userRepository.findByIdContainingIgnoreCase(keyword));
+        results.addAll(userRepository.findByNameContainingIgnoreCase(keyword));
+        return new ArrayList<>(results);
+    }
 }

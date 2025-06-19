@@ -4,6 +4,9 @@ import foodiediary.friendship.dto.FriendshipRequestDto;
 import foodiediary.friendship.dto.FriendshipResponseDto;
 import foodiediary.friendship.entity.Friendship;
 import foodiediary.friendship.service.FriendshipService;
+import foodiediary.user.dto.UserSearchResponseDto;
+import foodiediary.user.entity.User;
+import foodiediary.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import java.util.List;
 public class FriendshipController {
 
     private final FriendshipService svc;
+    private final UserService userService;
 
     private String getMyId(HttpServletRequest req) {
         return (String) req.getAttribute("id");
@@ -95,6 +99,27 @@ public class FriendshipController {
                         f.getStatus(),
                         f.getCreatedAt()
                 ))
+                .toList();
+    }
+
+    @GetMapping("/search")
+    public List<UserSearchResponseDto> searchFriends(HttpServletRequest req,
+                                                     @RequestParam String keyword) {
+        String myId = (String)req.getAttribute("id");
+        // 1) 전체 사용자 중 키워드에 걸리는 사람
+        List<User> candidates = userService.searchUsers(keyword);
+        // 2) 이미 친구인 사람과 자기 자신은 제외
+        List<String> myFriends = svc.getMyFriends(myId)
+                .stream()
+                .map(f ->
+                        f.getUserId().equals(myId)
+                                ? f.getFriendId()
+                                : f.getUserId()
+                )
+                .toList();
+        return candidates.stream()
+                .filter(u -> !u.getId().equals(myId) && !myFriends.contains(u.getId()))
+                .map(u -> new UserSearchResponseDto(u.getId(), u.getName(), u.getPhoneNum()))
                 .toList();
     }
 }
