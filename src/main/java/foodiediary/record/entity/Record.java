@@ -25,4 +25,10 @@ public class Record {
     private LocalDate date;
     
     private String author; // user.id (외래키)
+    
+    @Enumerated(EnumType.STRING)
+    private RecordVisibility visibility;
+    
+    @Column(name = "`like`")
+    private int like;
 }

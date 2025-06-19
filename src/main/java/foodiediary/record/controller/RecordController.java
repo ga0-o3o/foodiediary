@@ -1,7 +1,9 @@
 package foodiediary.record.controller;
 
 import foodiediary.record.dto.RecordResponseDto;
+import foodiediary.record.dto.RecordUpdateRequestDto;
 import foodiediary.record.dto.RecordWriteRequestDto;
+import foodiediary.record.entity.RecordVisibility;
 import foodiediary.record.service.RecordService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,17 +24,34 @@ public class RecordController {
     
     @PostMapping("/write")
     public ResponseEntity<Long> writeRecord(
-            @RequestParam String title,
-            @RequestParam String description,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
             @RequestParam("coordinate_x") BigDecimal coordinateX,
             @RequestParam("coordinate_y") BigDecimal coordinateY,
             @RequestParam("date") LocalDate date,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images,
-            @RequestParam("authorId") String authorId // 유저 정보를 직접 파라미터로 받음
+            @RequestParam("authorId") String authorId, // 유저 정보를 직접 파라미터로 받음
+            @RequestParam("visibility") String visibilityStr,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images
     ) throws IOException {
-        RecordWriteRequestDto dto = new RecordWriteRequestDto(title, description, coordinateX, coordinateY, date, images);
-        Long recordId = recordService.writeRecord(dto, authorId);
+        RecordVisibility visibility = RecordVisibility.valueOf(visibilityStr);
+        RecordWriteRequestDto dto = new RecordWriteRequestDto(title, description, coordinateX, coordinateY, date, authorId,
+                                                                visibility, images);
+        Long recordId = recordService.writeRecord(dto);
         return ResponseEntity.ok(recordId);
+    }
+    
+    @PatchMapping("/update")
+    public ResponseEntity<Long> updateRecord(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "visibility", required = false) String visibilityStr,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images
+    ) throws IOException {
+        RecordVisibility visibility = RecordVisibility.valueOf(visibilityStr);
+        RecordUpdateRequestDto dto = new RecordUpdateRequestDto(id, title, description, visibility, images);
+        recordService.updateRecord(dto);
+        return ResponseEntity.ok().build();
     }
     
     @GetMapping("/list")

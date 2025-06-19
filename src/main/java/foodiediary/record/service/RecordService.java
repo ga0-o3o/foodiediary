@@ -1,10 +1,11 @@
 package foodiediary.record.service;
 
 import foodiediary.record.dto.RecordResponseDto;
+import foodiediary.record.dto.RecordUpdateRequestDto;
 import foodiediary.record.dto.RecordWriteRequestDto;
 import foodiediary.record.entity.Record;
-import foodiediary.record.entity.RecordImagePath;
-import foodiediary.record.repository.RecordImagePathRepository;
+import foodiediary.record.entity.RecordImage;
+import foodiediary.record.repository.RecordImageRepository;
 import foodiediary.record.repository.RecordRepository;
 import foodiediary.s3.S3Service;
 
@@ -28,11 +29,11 @@ import java.util.*;
 public class RecordService {
     
     private final RecordRepository recordRepository;
-    private final RecordImagePathRepository imagePathRepository;
+    private final RecordImageRepository imageRepository;
     private final S3Service s3Service;
     
     @Transactional
-    public Long writeRecord(RecordWriteRequestDto dto, String authorId) throws IOException {
+    public Long writeRecord(RecordWriteRequestDto dto) throws IOException {
         // 1. Record 저장
         Record record = Record.builder()
                 .title(dto.getTitle())
@@ -40,30 +41,54 @@ public class RecordService {
                 .coordinateX(dto.getCoordinateX())
                 .coordinateY(dto.getCoordinateY())
                 .date(dto.getDate())
-                .author(authorId)
+                .author(dto.getAuthor())
+                .visibility(dto.getVisibility())
+                .like(0)
                 .build();
         recordRepository.save(record);
         
         // 2. 이미지 업로드 및 경로 저장
         List<MultipartFile> images = dto.getImages();
+        uploadImages(images, record.getId());
+        return record.getId();
+    }
+    
+    @Transactional
+    public void updateRecord(RecordUpdateRequestDto dto) throws IOException {
+        Record record = recordRepository.findById(dto.getId()).get();
+        record.setTitle(dto.getTitle());
+        record.setDescription(dto.getDescription());
+        record.setVisibility(dto.getVisibility());
+        recordRepository.save(record);
+        
+        List<RecordImage> oldImages = imageRepository.findByRecordId(record.getId());
+        for (RecordImage recordImage : oldImages) {
+            s3Service.deleteImageByUrl(recordImage.getImagePath());
+        }
+        
+        imageRepository.deleteByRecordId(record.getId());
+        
+        List<MultipartFile> images = dto.getImages();
+        uploadImages(images, record.getId());
+    }
+    
+    private void uploadImages(List<MultipartFile> images, Long id) throws IOException {
         if (images != null) {
             for (MultipartFile image : images) {
                 String imageUrl = s3Service.uploadImage(image); // S3 업로드 후 URL 반환
-                RecordImagePath imagePath = RecordImagePath.builder()
-                        .recordId(record.getId())
+                RecordImage imagePath = RecordImage.builder()
+                        .recordId(id)
                         .imagePath(imageUrl)
                         .build();
-                imagePathRepository.save(imagePath);
+                imageRepository.save(imagePath);
             }
         }
-        return record.getId();
     }
     
     public List<RecordResponseDto> getRecordsByAuthor(String authorId) {
         List<Record> records = recordRepository.findByAuthor(authorId);
         return mapToResponseDto(records);
     }
-
 
     public List<RecordResponseDto> getFilteredRecords(String authorId, LocalDate date, BigDecimal coordinate_x,
                                                       BigDecimal coordinate_y, String description, String title) {
@@ -110,9 +135,9 @@ public class RecordService {
 
     private List<RecordResponseDto> mapToResponseDto(List<Record> records) {
         return records.stream().map(record -> {
-            List<String> imagePaths = imagePathRepository.findByRecordId(record.getId())
+            List<String> imagePaths = imageRepository.findByRecordId(record.getId())
                     .stream()
-                    .map(RecordImagePath::getImagePath)
+                    .map(RecordImage::getImagePath)
                     .collect(Collectors.toList());
 
             return new RecordResponseDto(
@@ -122,11 +147,12 @@ public class RecordService {
                     record.getCoordinateX(),
                     record.getCoordinateY(),
                     record.getDate(),
+                    record.getAuthor(),
+                    record.getVisibility(),
+                    record.getLike(),
                     imagePaths
             );
         }).collect(Collectors.toList());
     }
-
-
 }
 
