@@ -55,28 +55,31 @@ public class RecordController {
     }
     
     @GetMapping("/list")
-    public List<RecordResponseDto> getRecordsByAuthor(
-            @RequestParam(required = false) String authorId,
-            @RequestParam(required = false) String date,
-            @RequestParam(required = false) String coordinateX,
-            @RequestParam(required = false) String coordinateY,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) String title) {
-
-        BigDecimal x = null;
-        BigDecimal y = null;
-        if (coordinateX != null && coordinateY != null) {
-            x = new BigDecimal(coordinateX);
-            y = new BigDecimal(coordinateY);
-        }
-
-        LocalDate parsedDate = null;
-        if(date != null){
-            parsedDate = LocalDate.parse(date);
-        }
-
-        return recordService.getFilteredRecords(authorId, parsedDate, x, y, description, title);
+    public List<RecordResponseDto> getRecordsByAuthor(@RequestParam String authorId) {
+        return recordService.getRecordsByAuthor(authorId);
     }
+//    public List<RecordResponseDto> getRecordsByAuthor(
+//            @RequestParam(required = false) String authorId,
+//            @RequestParam(required = false) String date,
+//            @RequestParam(required = false) String coordinateX,
+//            @RequestParam(required = false) String coordinateY,
+//            @RequestParam(required = false) String description,
+//            @RequestParam(required = false) String title) {
+//
+//        BigDecimal x = null;
+//        BigDecimal y = null;
+//        if (coordinateX != null && coordinateY != null) {
+//            x = new BigDecimal(coordinateX);
+//            y = new BigDecimal(coordinateY);
+//        }
+//
+//        LocalDate parsedDate = null;
+//        if(date != null){
+//            parsedDate = LocalDate.parse(date);
+//        }
+//
+//        return recordService.getFilteredRecords(authorId, parsedDate, x, y, description, title);
+//    }
 
     @GetMapping("/page")
     public List<RecordResponseDto> getInitialPage(@RequestParam(required = false) String pageNum){
