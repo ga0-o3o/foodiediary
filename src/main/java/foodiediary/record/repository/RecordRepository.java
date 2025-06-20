@@ -14,7 +14,7 @@ import java.util.List;
 public interface RecordRepository extends JpaRepository<Record, Long> {
 
     @Query("SELECT r FROM Record r WHERE r.author = :author " +
-            "AND (:title IS NULL OR r.title = :title) " +
+            "AND (:title IS NULL OR LOWER(r.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:date IS NULL OR r.date = :date) " +
             "AND (:coordinateX IS NULL OR r.coordinateX = :coordinateX) " +
             "AND (:coordinateY IS NULL OR r.coordinateY = :coordinateY) " +
@@ -30,7 +30,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 
     @Query("SELECT r FROM Record r WHERE r.author = :author " +
             "AND r.visibility = 'FRIEND' " +
-            "AND (:title IS NULL OR r.title = :title) " +
+            "AND (:title IS NULL OR LOWER(r.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:date IS NULL OR r.date = :date) " +
             "AND (:coordinateX IS NULL OR r.coordinateX = :coordinateX) " +
             "AND (:coordinateY IS NULL OR r.coordinateY = :coordinateY) " +
@@ -48,6 +48,6 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 
     Page<Record> findByAuthor(String author, Pageable pageable);
 
-    Page<Record> findByAuthorAndVisibility(String authorId, RecordVisibility recordVisibility,Pageable pageable);
+    Page<Record> findByAuthorAndVisibility(String authorId, RecordVisibility recordVisibility, Pageable pageable);
 
 }
