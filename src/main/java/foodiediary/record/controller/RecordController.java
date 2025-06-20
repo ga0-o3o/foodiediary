@@ -7,6 +7,8 @@ import foodiediary.record.entity.RecordVisibility;
 import foodiediary.record.service.RecordService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +55,7 @@ public class RecordController {
         recordService.updateRecord(dto);
         return ResponseEntity.ok().build();
     }
-    
+
     @GetMapping("/list")
     public List<RecordResponseDto> getRecords(
             @RequestParam(required = false) String authorId,
@@ -61,33 +63,37 @@ public class RecordController {
             @RequestParam(required = false) String coordinateX,
             @RequestParam(required = false) String coordinateY,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false) String title) {
+            @RequestParam(required = false) String title,
+            HttpServletRequest request) {
 
+        String userId = (String) request.getAttribute("id");  // 로그인한 사용자 ID
         BigDecimal x = null;
         BigDecimal y = null;
+
         if (coordinateX != null && coordinateY != null) {
             x = new BigDecimal(coordinateX);
             y = new BigDecimal(coordinateY);
         }
 
         LocalDate parsedDate = null;
-        if(date != null){
+        if (date != null) {
             parsedDate = LocalDate.parse(date);
         }
 
-        return recordService.getFilteredRecords(authorId, parsedDate, x, y, description, title);
+        return recordService.getFilteredRecords(userId, authorId, parsedDate, x, y, description, title);
     }
 
     @GetMapping("/page")
-    public List<RecordResponseDto> getInitialPage(@RequestParam(required = false) String pageNum){
-        int page;
-        if(pageNum == null){
-            page = 1;
-        } else {
-            page = Integer.parseInt(pageNum);
-        }
+    public List<RecordResponseDto> getInitialPage(
+            @RequestParam(required = false) String authorId,
+            @RequestParam(required = false) String pageNum,
+            HttpServletRequest request) {
 
-        return recordService.getPagedRecords(page);
+        String userId = (String) request.getAttribute("id");
+        int page = (pageNum == null) ? 1 : Integer.parseInt(pageNum);
+
+        return recordService.getPagedRecords(userId, authorId, page);
     }
+
 
 }
