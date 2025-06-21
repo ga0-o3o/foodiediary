@@ -1,6 +1,7 @@
 package foodiediary.friendship.repository;
 
 import foodiediary.friendship.entity.Friendship;
+import foodiediary.friendship.entity.FriendshipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +26,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
 
     @Query("SELECT f FROM Friendship f WHERE f.userId = :userId AND f.status = 'PENDING'")
     List<Friendship> findSentRequests(String userId);
+
+    boolean existsByUserIdAndFriendIdAndStatus(String authorId, String loggedInUserId, FriendshipStatus friendshipStatus);
 }
