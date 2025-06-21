@@ -41,15 +41,16 @@ public class RecordController {
     }
     
     @PatchMapping("/update")
-    public ResponseEntity<Long> updateRecord(
+    public ResponseEntity<?> updateRecord(
             @RequestParam("id") Long id,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "visibility", required = false) String visibilityStr,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images
+            @RequestParam(value = "deleteImageUrls", required = false) List<String> deleteImageUrls,
+            @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages
     ) throws IOException {
-        RecordVisibility visibility = RecordVisibility.valueOf(visibilityStr);
-        RecordUpdateRequestDto dto = new RecordUpdateRequestDto(id, title, description, visibility, images);
+        RecordVisibility visibility = visibilityStr != null ? RecordVisibility.valueOf(visibilityStr) : null;
+        RecordUpdateRequestDto dto = new RecordUpdateRequestDto(id, title, description, visibility, deleteImageUrls, newImages);
         recordService.updateRecord(dto);
         return ResponseEntity.ok().build();
     }

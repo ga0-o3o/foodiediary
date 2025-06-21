@@ -55,21 +55,38 @@ public class RecordService {
     
     @Transactional
     public void updateRecord(RecordUpdateRequestDto dto) throws IOException {
-        Record record = recordRepository.findById(dto.getId()).get();
-        record.setTitle(dto.getTitle());
-        record.setDescription(dto.getDescription());
-        record.setVisibility(dto.getVisibility());
-        recordRepository.save(record);
+        Record record = recordRepository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Record not found"));
         
-        List<RecordImage> oldImages = imageRepository.findByRecordId(record.getId());
-        for (RecordImage recordImage : oldImages) {
-            s3Service.deleteImageByUrl(recordImage.getImagePath());
+        // 1. 삭제할 이미지 처리
+        if (dto.getDeleteImageUrls() != null && !dto.getDeleteImageUrls().isEmpty()) {
+            for (String url : dto.getDeleteImageUrls()) {
+                // 1) DB에서 삭제
+                imageRepository.deleteByImagePath(url);
+                // 2) S3에서 삭제
+                s3Service.deleteImageByUrl(url);
+            }
         }
         
-        imageRepository.deleteByRecordId(record.getId());
+        // 2. 새 이미지 업로드 전 개수 체크
+        int currentImageCount = imageRepository.countByRecordId((record.getId()));
+        int newImageCount = (dto.getNewImages() != null) ? dto.getNewImages().size() : 0;
+        if (currentImageCount + newImageCount > 3)
+            throw new IllegalArgumentException("이미지는 최대 3장까지 등록할 수 있습니다.");
         
-        List<MultipartFile> images = dto.getImages();
-        uploadImages(images, record.getId());
+        // 3. 새 이미지 업로드
+        if (dto.getNewImages() != null) {
+            List<MultipartFile> images = dto.getNewImages();
+            uploadImages(images, record.getId());
+        }
+        
+        // 4. 기타 필드 업데이트
+        if (dto.getTitle() != null) record.setTitle(dto.getTitle());
+        if (dto.getDescription() != null) record.setDescription(dto.getDescription());
+        if (dto.getVisibility() != null) record.setVisibility(dto.getVisibility());
+        
+        // dirty checking
+        recordRepository.save(record);
     }
     
     private void uploadImages(List<MultipartFile> images, Long id) throws IOException {
