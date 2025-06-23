@@ -14,5 +14,8 @@ public class RecordUpdateRequestDto {
     private String title;
     private String description;
     private RecordVisibility visibility;
-    private List<MultipartFile> images; // 최대 3개
+    // 삭제할 이미지 URL 목록
+    private List<String> deleteImageUrls;
+    // 새로 추가할 이미지 파일 목록
+    private List<MultipartFile> newImages;
 }
