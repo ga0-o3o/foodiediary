@@ -107,13 +107,21 @@ public class RecordService {
         }
     }
 
-    public List<RecordResponseDto> getFilteredRecords(String loggedInUserId, String authorId, LocalDate date, BigDecimal coordinateX,
+    public List<RecordResponseDto> getFilteredRecords(String loggedInUserId, String authorId,
+                                                      LocalDate date, BigDecimal coordinateX,
                                                       BigDecimal coordinateY, String description, String title) {
         List<Record> records;
 
         boolean isOwner = (authorId == null || loggedInUserId.equals(authorId));
-        boolean isFriend = !isOwner && (friendshipRepository.existsByUserIdAndFriendIdAndStatus(loggedInUserId, authorId, FriendshipStatus.ACCEPTED)
-                || friendshipRepository.existsByUserIdAndFriendIdAndStatus(authorId, loggedInUserId, FriendshipStatus.ACCEPTED));
+        boolean isFriend = false;
+
+        if (!isOwner && authorId != null) {
+            // 알파벳 순으로 정렬된 userId와 friendId로 검사
+            String user1 = loggedInUserId.compareTo(authorId) < 0 ? loggedInUserId : authorId;
+            String user2 = loggedInUserId.compareTo(authorId) < 0 ? authorId : loggedInUserId;
+
+            isFriend = friendshipRepository.existsByUserIdAndFriendIdAndStatus(user1, user2, FriendshipStatus.ACCEPTED);
+        }
 
         if (isOwner) {
             records = recordRepository.findFilteredRecordsForOwner(
@@ -129,6 +137,7 @@ public class RecordService {
 
         return mapToResponseDto(records);
     }
+
 
     public List<RecordResponseDto> getPagedRecords(String loggedInUserId, String authorId, int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber - 1, 5, Sort.by(Sort.Direction.DESC, "date"));
