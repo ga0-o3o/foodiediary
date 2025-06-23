@@ -163,7 +163,6 @@ public class RecordService {
         return mapToResponseDto(page.getContent());
     }
 
-
     private List<RecordResponseDto> mapToResponseDto(List<Record> records) {
         return records.stream().map(record -> {
             List<String> imagePaths = imageRepository.findByRecordId(record.getId())

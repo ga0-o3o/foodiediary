@@ -44,6 +44,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
             @org.springframework.data.repository.query.Param("description") String description
     );
 
+
     Page<Record> findByVisibilityOrderByLikeDesc(RecordVisibility visibility, Pageable pageable);
 
     Page<Record> findByAuthor(String author, Pageable pageable);

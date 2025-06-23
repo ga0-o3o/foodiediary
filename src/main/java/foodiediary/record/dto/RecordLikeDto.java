@@ -8,4 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RecordLikeDto {
     private long recordId;
+
 }
