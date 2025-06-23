@@ -61,7 +61,7 @@ public class RecordController {
         return ResponseEntity.ok().build();
     }
     
-    @GetMapping("delete")
+    @DeleteMapping("delete")
     public ResponseEntity<?> deleteRecord(
             @RequestParam Long id
     ) {
