@@ -6,6 +6,7 @@ import foodiediary.record.dto.RecordUpdateRequestDto;
 import foodiediary.record.dto.RecordWriteRequestDto;
 import foodiediary.record.entity.Record;
 import foodiediary.record.entity.RecordVisibility;
+import foodiediary.record.repository.RecordRepository;
 import foodiediary.record.service.RecordService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -57,6 +58,14 @@ public class RecordController {
         RecordVisibility visibility = visibilityStr != null ? RecordVisibility.valueOf(visibilityStr) : null;
         RecordUpdateRequestDto dto = new RecordUpdateRequestDto(id, title, description, visibility, deleteImageUrls, newImages);
         recordService.updateRecord(dto);
+        return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("delete")
+    public ResponseEntity<?> deleteRecord(
+            @RequestParam Long id
+    ) {
+        recordService.deleteRecord(id);
         return ResponseEntity.ok().build();
     }
 

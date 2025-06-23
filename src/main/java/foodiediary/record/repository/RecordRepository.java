@@ -52,4 +52,6 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     Page<Record> findByAuthorAndVisibility(String authorId, RecordVisibility recordVisibility, Pageable pageable);
 
     Page<Record> findByAuthorAndVisibilityIn(String authorId, List<RecordVisibility> friend, Pageable pageable);
+    
+    void deleteRecordById(Long id);
 }

@@ -94,6 +94,12 @@ public class RecordService {
         recordRepository.save(record);
     }
     
+    @Transactional
+    public void deleteRecord(Long id) {
+        if (recordRepository.findById(id).isPresent())
+            recordRepository.deleteRecordById(id);
+    }
+    
     private void uploadImages(List<MultipartFile> images, Long id) throws IOException {
         if (images != null) {
             for (MultipartFile image : images) {
