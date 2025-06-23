@@ -115,7 +115,7 @@ public class RecordService {
         boolean isOwner = (authorId == null || loggedInUserId.equals(authorId));
         boolean isFriend = false;
 
-        if (!isOwner && authorId != null) {
+        if (!isOwner) {
             // 알파벳 순으로 정렬된 userId와 friendId로 검사
             String user1 = loggedInUserId.compareTo(authorId) < 0 ? loggedInUserId : authorId;
             String user2 = loggedInUserId.compareTo(authorId) < 0 ? authorId : loggedInUserId;
@@ -141,19 +141,25 @@ public class RecordService {
 
     public List<RecordResponseDto> getPagedRecords(String loggedInUserId, String authorId, int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber - 1, 5, Sort.by(Sort.Direction.DESC, "date"));
-
-        Page<Record> page;
+        Page<Record> page = null;
 
         boolean isOwner = (authorId == null || loggedInUserId.equals(authorId));
-        boolean isFriend = !isOwner && (friendshipRepository.existsByUserIdAndFriendIdAndStatus(loggedInUserId, authorId, FriendshipStatus.ACCEPTED)
-                || friendshipRepository.existsByUserIdAndFriendIdAndStatus(authorId, loggedInUserId, FriendshipStatus.ACCEPTED));
+        boolean isFriend = false;
+
+        if (!isOwner && authorId != null) {
+            String user1 = loggedInUserId.compareTo(authorId) < 0 ? loggedInUserId : authorId;
+            String user2 = loggedInUserId.compareTo(authorId) < 0 ? authorId : loggedInUserId;
+            isFriend = friendshipRepository.existsByUserIdAndFriendIdAndStatus(user1, user2, FriendshipStatus.ACCEPTED);
+        }
 
         if (isOwner) {
             page = recordRepository.findByAuthor(loggedInUserId, pageable);
         } else if (isFriend) {
-            page = recordRepository.findByAuthorAndVisibility(authorId, RecordVisibility.FRIEND, pageable);
-        } else {
-            return List.of();
+            page = recordRepository.findByAuthorAndVisibilityIn(
+                    authorId,
+                    List.of(RecordVisibility.FRIEND, RecordVisibility.PUBLIC),
+                    pageable
+            );
         }
 
         return mapToResponseDto(page.getContent());

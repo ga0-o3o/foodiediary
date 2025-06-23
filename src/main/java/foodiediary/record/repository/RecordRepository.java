@@ -29,7 +29,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     );
 
     @Query("SELECT r FROM Record r WHERE r.author = :author " +
-            "AND r.visibility = 'FRIEND' " +
+            "AND  r.visibility IN ('FRIEND','PUBLIC') " +
             "AND (:title IS NULL OR LOWER(r.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
             "AND (:date IS NULL OR r.date = :date) " +
             "AND (:coordinateX IS NULL OR r.coordinateX = :coordinateX) " +
@@ -51,4 +51,5 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 
     Page<Record> findByAuthorAndVisibility(String authorId, RecordVisibility recordVisibility, Pageable pageable);
 
+    Page<Record> findByAuthorAndVisibilityIn(String authorId, List<RecordVisibility> friend, Pageable pageable);
 }
