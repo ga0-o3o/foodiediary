@@ -2,6 +2,7 @@ package foodiediary.record.service;
 
 import foodiediary.friendship.entity.FriendshipStatus;
 import foodiediary.friendship.repository.FriendshipRepository;
+import foodiediary.record.dto.RecordLikeDto;
 import foodiediary.record.dto.RecordResponseDto;
 import foodiediary.record.dto.RecordUpdateRequestDto;
 import foodiediary.record.dto.RecordWriteRequestDto;
@@ -129,6 +130,19 @@ public class RecordService {
             return List.of();
         }
 
+        return mapToResponseDto(page.getContent());
+    }
+
+    public void saveRecordLike(RecordLikeDto likeDto){
+        Record record = recordRepository.findById(likeDto.getRecordId())
+                .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을 수 없습니다."));
+        record.setLike(record.getLike() + 1);
+        recordRepository.save(record);
+    }
+
+    public List<RecordResponseDto> getPopularPublicRecords(int pageNum) {
+        Pageable pageable = PageRequest.of(pageNum - 1, 5, Sort.by(Sort.Direction.DESC, "like"));
+        Page<Record> page = recordRepository.findByVisibilityOrderByLikeDesc(RecordVisibility.PUBLIC, pageable);
         return mapToResponseDto(page.getContent());
     }
 
